@@ -29,10 +29,21 @@ import json
 import logging
 import subprocess
 import time
+import typing
 from collections import deque
 from pathlib import Path
 
-import serial
+import serial  # type: ignore
+
+class DetectionEvent(typing.TypedDict):
+    ts: int
+    src: str
+    score: float
+    x: int
+    y: int
+    w: int
+    h: int
+    label: str
 
 # --- configuration --------------------------------------------------------
 SERIAL_PORT = "/dev/serial0"
@@ -60,7 +71,7 @@ logging.basicConfig(
 # --------------------------------------------------------------------------
 
 
-def parse(line: str) -> dict | None:
+def parse(line: str) -> DetectionEvent | None:
     """Parse one CSV detection line. Returns None on malformed input."""
     parts = line.strip().split(",")
     if len(parts) != 9 or parts[0] != "EVT":
@@ -80,7 +91,7 @@ def parse(line: str) -> dict | None:
         return None
 
 
-def should_escalate(events: list[dict]) -> bool:
+def should_escalate(events: list[DetectionEvent]) -> bool:
     """Decide whether the current sliding-window burst warrants waking Pi 5."""
     interesting = [e for e in events if e["label"] not in EXCLUDE_LABELS]
     if len(interesting) < MIN_EVENTS:
@@ -88,7 +99,7 @@ def should_escalate(events: list[dict]) -> bool:
     return any(e["score"] >= MIN_INTERESTING_SCORE for e in interesting)
 
 
-def wake_pi5(events: list[dict], state: dict) -> None:
+def wake_pi5(events: list[DetectionEvent], state: dict[str, float]) -> None:
     """Send WoL magic packet, then SSH-trigger the capture script on Pi 5."""
     now = time.time()
     if now - state["last_wake"] < WAKE_COOLDOWN_SEC:
@@ -120,7 +131,7 @@ def wake_pi5(events: list[dict], state: dict) -> None:
 
 def main() -> None:
     ser = serial.Serial(SERIAL_PORT, BAUD, timeout=1)
-    recent: deque[tuple[float, dict]] = deque()
+    recent: deque[tuple[float, DetectionEvent]] = deque()
     state = {"last_wake": 0.0}
 
     logging.info("Gatekeeper started on %s @ %d baud", SERIAL_PORT, BAUD)
