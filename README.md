@@ -1,5 +1,14 @@
 # UAP Detection Station — configuration bundle
 
+[![Status: Active](https://img.shields.io/badge/Status-Active-brightgreen.svg)]()
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)]()
+
+> **Documentation Index**
+> - [Architecture (C4 Model)](./ARCHITECTURE.md)
+> - [Changelog](./CHANGELOG.md)
+> - [Regression & QA Plan](./REGRESSION_PLAN.md)
+> - [Next Steps & Roadmap](./NEXT_STEPS.md)
+
 Per-device configuration for the three-tier detection station described in
 `UAP_Station_Build_Guide.pdf`. Generated 2026-04-25.
 

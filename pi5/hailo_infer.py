@@ -27,6 +27,7 @@ import argparse
 import json
 import sys
 import time
+import typing
 from pathlib import Path
 
 
@@ -41,7 +42,7 @@ def parse_args() -> argparse.Namespace:
     return p.parse_args()
 
 
-def emit(out_fh, label: str, score: float, bbox: tuple[int, int, int, int]):
+def emit(out_fh: typing.TextIO, label: str, score: float, bbox: tuple[int, int, int, int]) -> None:
     """Write one detection as a JSON line."""
     out_fh.write(json.dumps({
         "ts": time.time(),
@@ -52,7 +53,7 @@ def emit(out_fh, label: str, score: float, bbox: tuple[int, int, int, int]):
     out_fh.flush()
 
 
-def run_pipeline(args: argparse.Namespace, out_fh) -> None:
+def run_pipeline(args: argparse.Namespace, out_fh: typing.TextIO) -> None:
     """Drop-in point for the Hailo example pipeline.
 
     Replace this stub with a real pipeline call. A working starting point
