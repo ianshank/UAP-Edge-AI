@@ -1,0 +1,13 @@
+[Unit]
+Description=UAP Gatekeeper (tier-2 detection event router)
+After=network.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/uap_gatekeeper.py
+Restart=always
+RestartSec=5
+User=pi
+
+[Install]
+WantedBy=multi-user.target
